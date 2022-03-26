@@ -51,15 +51,15 @@
                   </v-menu>
                </div>
                <v-text-field
-                  name="CVV"
-                  type="CVV"
-                  label="CVV"
+                  name="CVC"
+                  type="CVC"
+                  label="CVC"
                   required
-                  v-model="CVV"
+                  v-model="CVC"
                ></v-text-field>
                
-               <v-btn color="primary" @click.prevent="signUpUser"
-                  >Sign Up</v-btn>
+               <v-btn color="primary" @click="Pay"
+                  >Pay</v-btn>
             </v-col>
          </v-row>
       </v-form>
@@ -69,8 +69,34 @@
 
 <script>
 
+import store from '@/store'
+import { db } from '@/firebase.js'
+
+
 export default {
+	props: ['Pay'],
 	name: "Payment",
+   data () {
+      return{
+      store,
+      };
+   },
+   methods: {
+      Pay() {
+      db.collection("payment").add({
+        id: this.id,
+		user: this.isRented.currentUser,
+		product: this.product.products,
+        uid: this.uid
+      })
+      .then(() => {
+        console.log("dobar")
+      })
+      .catch((e) => {
+        console.log("ne radi", e)
+      }) 
+    }
+  }
 };
 
 </script>
