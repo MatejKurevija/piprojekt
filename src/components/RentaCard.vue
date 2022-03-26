@@ -46,11 +46,12 @@
 				</v-card-actions>
 			</v-row>
 		</v-card-text>
-		<v-btn href="/process_payment" color="purple" class="white--text" width="100%" >Rent</v-btn>
+		<v-btn href="/payment" color="purple" class="white--text" width="100%" @click="Pay">Rent</v-btn>
 	</v-card>
 </template>
 
 <script>
+import store from '@/store'
 import {
 	doc,
 	db,
@@ -62,10 +63,12 @@ import {
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+	props: ['Pay'],
 	name: "RentaCard",
 	data() {
 		return {
 			loaded: false,
+			store,
 		};
 	},
 	computed: {
@@ -78,6 +81,7 @@ export default {
 			}
 		},
 	},
+	
 	props: {
 		id: String,
 		seller: String,
@@ -111,6 +115,22 @@ export default {
 			}
 		},
 	},
+	methods: {
+      Pay() {
+      db.collection("payment").add({
+        id: this.id,
+		user: this.isRented.currentUser,
+		product: this.product.products,
+        uid: this.uid
+      })
+      .then(() => {
+        console.log("dobar")
+      })
+      .catch((e) => {
+        console.log("ne radi", e)
+      }) 
+    }
+  }
 };
 </script>
 
