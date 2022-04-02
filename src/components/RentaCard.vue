@@ -46,7 +46,7 @@
 				</v-card-actions>
 			</v-row>
 		</v-card-text>
-		<v-btn href="/payment" color="purple" class="white--text" width="100%" @click="Pay">Rent</v-btn>
+		<v-btn :to="{ name: 'Payment', params: { pid: id } }" color="purple" class="white--text" width="100%" @click="Pay">Rent</v-btn>
 	</v-card>
 </template>
 
