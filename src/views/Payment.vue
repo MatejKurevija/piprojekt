@@ -3,23 +3,21 @@
       <v-form justify="center" align="center" class="mb-10">
          <v-row justify="center" class="mt-10">
             <v-col md="4" sm="9" xsm="9">
-               <h2 class="text-center">Unesite podatke o placanju</h2>
+               <h2 class="text-center">Insert payment info</h2>
                <v-text-field
-                  name="Broj kartice"
-                  label="Broj kartice"
+                  name="Credit card number"
+                  label="Credit card number"
                   type="number"
-                  v-model="firstName"
+                  counter ="16"
                ></v-text-field>
                <v-text-field
-                  name="Ime i prezime"
+                  name="Last name"
                   type="text"
-                  label="Ime i prezime"
-                  v-model="lastName"
+                  label="Last name"
                ></v-text-field>
                <div>
                   <v-menu
                      ref="menu"
-                     v-model="menu"
                      :close-on-content-click="false"
                      transition="scale-transition"
                      offset-y
@@ -27,16 +25,13 @@
                   >
                      <template v-slot:activator="{ on, attrs }">
                         <v-text-field
-                           v-model="date"
-                           label="Datum isteka kartice"
+                           label="Expiration date"
                            readonly
                            v-bind="attrs"
                            v-on="on"
                         ></v-text-field>
                      </template>
                      <v-date-picker
-                        v-model="date"
-                        :active-picker.sync="activePicker"
                         :max="
                            new Date(
                               Date.now() -
@@ -46,7 +41,6 @@
                               .substr(0, 10)
                         "
                         min="1950-01-01"
-                        @change="save"
                      ></v-date-picker>
                   </v-menu>
                </div>
@@ -55,11 +49,18 @@
                   type="CVC"
                   label="CVC"
                   required
-                  v-model="CVC"
+                  counter="3"
                ></v-text-field>
-               
-               <v-btn color="primary" @click="Pay"
+               <div type="text">Review the renter</div>
+               <v-rating
+               color="warning"
+               background-color="grey"
+               hover
+               v-model="rating"
+         ></v-rating>
+               <v-btn color="primary" @click="payment"
                   >Pay</v-btn>
+
             </v-col>
          </v-row>
       </v-form>
@@ -69,35 +70,67 @@
 
 <script>
 
-import store from '@/store'
-import { db } from '@/firebase.js'
 
+import { db, addDoc, getDoc, doc, auth, collection,} from "@/firebase"; 
+import { mapGetters } from "vuex";
 
 export default {
-	props: ['Pay'],
-	name: "Payment",
+	name: "pay",
    data () {
       return{
-      store,
+         isRented: false,
+         rentedBy: "",
+         IDproduct: "",
+         rating: 0,
+         id: this.$route.params.pid,
+         seller: "",
       };
    },
-   methods: {
-      Pay() {
-      db.collection("payment").add({
-        id: this.id,
-		user: this.isRented.currentUser,
-		product: this.product.products,
-        uid: this.uid
-      })
-      .then(() => {
-        console.log("dobar")
-      })
-      .catch((e) => {
-        console.log("ne radi", e)
-      }) 
-    }
-  }
+   computed: {
+		...mapGetters({
+			user: "user",
+		}),
+
+	},
+	mounted() {
+		this.proizvod();
+    //  this.getsellerid();
+   },
+
+methods: {
+    async payment() {
+            const Payment = {
+				isRented: true,
+            rentedBy: this.user.uid,
+            IDproduct:  this.id,
+            seller: this.seller,
+            rating: this.rating,
+				};
+         const docRef = await addDoc(collection(db, "payment"), Payment);
+
+         console.log("document writen with id: ", docRef.id)
+      
+      },
+
+         async proizvod(){
+         const docRef = doc(db, "products", this.id);
+			const docSnap = await getDoc(docRef);
+			this.product = docSnap.data();
+        
+         },
+           /*  async getsellerid (){
+               if (this.IDproduct = this.id) {
+               const docRef = doc(db, "products", "uid");
+               const docSnap = await getDoc(docRef);
+               console.log(docSnap)
+            }  else {
+               
+               console.log("No such document!");
+         }
+      },            */
+   }      
 };
+      
 
 </script>
 
