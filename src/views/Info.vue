@@ -72,7 +72,7 @@
 						color="purple"
 						class="white--text"
 						width="100%"
-						href="/process_payment"
+						:to="{ name: 'Payment', params: { pid: id } }"
 						>Rent</v-btn
 					>
 					<v-btn
